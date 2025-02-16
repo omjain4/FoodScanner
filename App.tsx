@@ -29,7 +29,7 @@ const App: React.FC = () => {
 
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
-
+//hello
   useEffect(() => {
     async function init() {
       const has = await GoogleSignin.hasPlayServices();
