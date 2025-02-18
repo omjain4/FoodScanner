@@ -18,8 +18,8 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({onSwitchToSignup}) => {
-  const [email, setEmail] = useState<string>('jane.doe@example.com');
-  const [password, setPassword] = useState<string>('SuperSecretPassword!');
+  const [email, setEmail] = useState<string>();
+  const [password, setPassword] = useState<string>();
 
   useEffect(() => {
     async function init() {
@@ -35,22 +35,26 @@ const Login: React.FC<LoginProps> = ({onSwitchToSignup}) => {
   }, []);
 
   const onLogin = () => {
-    auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(() => {
-        console.log('User signed in!');
-      })
-      .catch(error => {
-        if (error.code === 'auth/user-not-found') {
-          console.log('No user found for that email.');
-        }
+    if (email && password) {
+      auth()
+        .signInWithEmailAndPassword(email, password)
+        .then(() => {
+          console.log('User signed in!');
+        })
+        .catch(error => {
+          if (error.code === 'auth/user-not-found') {
+            console.log('No user found for that email.');
+          }
 
-        if (error.code === 'auth/wrong-password') {
-          console.log('Incorrect password.');
-        }
+          if (error.code === 'auth/wrong-password') {
+            console.log('Incorrect password.');
+          }
 
-        console.error(error);
-      });
+          console.error(error);
+        });
+    } else {
+      console.log('Email and password must not be empty.');
+    }
   };
   const onGoogleButtonPress = async () => {
     try {
