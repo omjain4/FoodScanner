@@ -7,6 +7,10 @@ import {
   StyleSheet,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+} from '@react-native-google-signin/google-signin';
 import { WEB_CLIENT_ID } from '@env';
 
 interface LoginProps {
@@ -16,6 +20,19 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({onSwitchToSignup}) => {
   const [email, setEmail] = useState<string>('jane.doe@example.com');
   const [password, setPassword] = useState<string>('SuperSecretPassword!');
+
+  useEffect(() => {
+    async function init() {
+      const has = await GoogleSignin.hasPlayServices();
+      if (has) {
+        GoogleSignin.configure({
+          offlineAccess: true,
+          webClientId: WEB_CLIENT_ID,
+        });
+      }
+    }
+    init();
+  }, []);
 
   const onLogin = () => {
     auth()
@@ -34,6 +51,27 @@ const Login: React.FC<LoginProps> = ({onSwitchToSignup}) => {
 
         console.error(error);
       });
+  };
+  const onGoogleButtonPress = async () => {
+    try {
+      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+      // Obtain the user's ID token
+      const data: any = await GoogleSignin.signIn();
+
+      // create a new firebase credential with the token
+      const googleCredential = auth.GoogleAuthProvider.credential(
+        data?.data.idToken,
+      );
+
+      console.log('credential: ', googleCredential);
+      // login with credential
+      await auth().signInWithCredential(googleCredential);
+
+      //  Handle the linked account as needed in your app
+      return;
+    } catch (e) {
+      console.log('e: ', e);
+    }
   };
 
   return (
@@ -63,6 +101,13 @@ const Login: React.FC<LoginProps> = ({onSwitchToSignup}) => {
           Don't have an account? Sign Up
         </Text>
       </TouchableOpacity>
+      <GoogleSigninButton
+        onPress={() =>
+          onGoogleButtonPress().then(() =>
+            console.log('Signed in with Google!'),
+          )
+        }
+      />
     </View>
   );
 };
