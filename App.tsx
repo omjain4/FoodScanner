@@ -11,6 +11,7 @@ import usePushNotification from './src/usePushNotification';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import Signup from './src/Signup';
 import Login from './src/Login';
+import HomeScreen from './src/HomeScreen';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {API_URL, WEB_CLIENT_ID} from "@env"
 
@@ -107,14 +108,7 @@ const App: React.FC = () => {
   console.log('user: ', user);
 
   if (!!user) {
-    return (
-      <View style={styles.userContainer}>
-        <Text>Welcome, {user.email}</Text>
-        <TouchableOpacity style={styles.button} onPress={onLogout}>
-          <Text style={styles.buttonText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
-    );
+    return <HomeScreen email={user.email || ''} onLogout={onLogout} />;
   }
 
   return (
